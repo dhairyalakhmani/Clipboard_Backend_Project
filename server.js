@@ -17,6 +17,23 @@ wss.on('connection' , (ws) => {
     handleSocketConnection(ws , wss);
 });
 
+const interval = setInterval(() => {
+    wss.clients.forEach(ws => {
+        if(ws.isAlive === false){
+            console.log('Terminating ghost connection...');
+            return ws.terminate();
+        }
+
+        ws.isAlive = false;
+
+        ws.ping();
+    })
+}, 30000)
+
+wss.on('close' , () => {
+    clearInterval(interval);
+})
+
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT , () => { 

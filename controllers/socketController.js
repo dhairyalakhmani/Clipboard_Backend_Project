@@ -3,7 +3,10 @@ const Room = require('../models/Room.js');
 
 const handleSocketConnection = (ws , wss) => {
     console.log('Device Connected!');
-
+    ws.isAlive = true;
+    ws.on('pong' , () => {
+        ws.isAlive = true;
+    })
     ws.on('message' , async(message) => { 
         try{
             const data = JSON.parse(message);
