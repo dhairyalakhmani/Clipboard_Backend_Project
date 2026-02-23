@@ -35,6 +35,10 @@ ws.onmessage = (event) => {
         data.clips.forEach(clip => displayClip(clip , false));
         clipsLoaded += data.clips.length;
     }
+
+    if(data.type === 'error'){
+        alert(data.message);
+    }
 };
 
 function joinRoom() {
