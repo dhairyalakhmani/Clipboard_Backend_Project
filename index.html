@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clipboard App</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+    #room-screen { display: none; } /* Hidden until the user joins a room */
+    .clip-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+    .device-badge { font-size: 0.8em; color: white; background: #007bff; padding: 2px 6px; border-radius: 3px; }
+    .timestamp { font-size: 0.8em; color: gray; float: right; }
+    #load-more-btn { width: 100%; padding: 10px; margin-bottom: 15px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div id="join-screen">
+    <h2>Join a Clipboard Room</h2>
+    <input type="text" id="room-input" placeholder="Enter Room Name">
+    <button onclick="joinRoom()">Join Room</button>
+  </div>
+
+  <div id="room-screen">
+    <h2 id="room-title">Room: </h2>
+    <button onclick="leaveRoom()" style="background: red; color: white;">Unpair / Leave</button>
+    <hr>
+    
+    <textarea id="clip-input" rows="3" style="width: 100%;" placeholder="Paste or type text here..."></textarea>
+    <button onclick="sendClip()" style="margin-top: 10px; padding: 10px;">Send Clip</button>
+    
+    <hr>
+    <h3>Clipboard History</h3>
+    <button id="load-more-btn" onclick="fetchOlderClips()">Load Older Clips</button>
+    <div id="clips-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
