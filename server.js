@@ -4,6 +4,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const connectDB = require('./config/db.js');
 const handleSocketConnection = require('./controllers/socketController.js');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,23 +13,21 @@ const wss = new WebSocket.Server({server});
 connectDB();
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 wss.on('connection' , (ws) => {
     handleSocketConnection(ws , wss);
 });
 
 const interval = setInterval(() => {
+    const now = Date.now();
     wss.clients.forEach(ws => {
-        if(ws.isAlive === false){
-            console.log('Terminating ghost connection...');
+        if(now - ws.lastSeen > 90000){
+            console.log('Terminating dead connection due to inactivity...');
             return ws.terminate();
         }
-
-        ws.isAlive = false;
-
-        ws.ping();
     })
-}, 30000)
+}, 120000)
 
 wss.on('close' , () => {
     clearInterval(interval);

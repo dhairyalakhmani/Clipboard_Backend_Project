@@ -2,6 +2,12 @@ const ws = new WebSocket('ws://localhost:3000');
 let currentRoom = '';
 let clipsLoaded = 0;
 
+setInterval(() => {
+    if(ws.readyState === WebSocket.OPEN){
+        ws.send(JSON.stringify({type : 'heartbeat'}));
+    }
+}, 30000)
+
 function getDeviceId() { 
     let id = localStorage.getItem('deviceId');
     if(!id){
@@ -17,7 +23,7 @@ console.log(`My device ID : ${myDeviceId}`);
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    if(data.type === 'initial_clips'){
+if(data.type === 'initial_clips'){
         data.clips.forEach(clip => displayClip(clip , false));
         clipsLoaded = data.clips.length;
     }

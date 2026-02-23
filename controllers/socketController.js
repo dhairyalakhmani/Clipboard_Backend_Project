@@ -3,17 +3,17 @@ const Room = require('../models/Room.js');
 
 const handleSocketConnection = (ws , wss) => {
     console.log('Device Connected!');
-    ws.isAlive = true;
-    ws.on('pong' , () => {
-        ws.isAlive = true;
-    })
+    ws.lastSeen = Date.now();
     ws.on('message' , async(message) => { 
+        ws.lastSeen = Date.now();
         try{
             const data = JSON.parse(message);
 
+            if(data.type === 'heartbeat') return;
+
             if(data.type === 'join_room') {
 
-                if(!data.roomName || typeOf (data.roomName) !== "string" || data.roomName.length > 50){
+                if(!data.roomName || typeof (data.roomName) !== "string" || data.roomName.length > 50){
                     return ws.send(JSON.stringify({
                         type : 'error',
                         message : 'Please enter a valid room name.'
