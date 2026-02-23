@@ -9,6 +9,13 @@ const handleSocketConnection = (ws , wss) => {
             const data = JSON.parse(message);
 
             if(data.type === 'join_room') {
+
+                if(!data.roomName || typeOf (data.roomName) !== "string" || data.roomName.length > 50){
+                    return ws.send(JSON.stringify({
+                        type : 'error',
+                        message : 'Please enter a valid room name.'
+                    }));
+                }
                 ws.room = data.roomName;
 
                 let room = await Room.findOne({name : data.roomName});
@@ -20,6 +27,12 @@ const handleSocketConnection = (ws , wss) => {
             }
 
             if(data.type == 'send_clip'){
+                if (!data.text || typeof data.text !== 'string' || data.text.length > 5000) {
+                    return ws.send(JSON.stringify({ type: 'error', message: 'Clip is empty or exceeds 5000 characters.' }));
+                }
+                if (!data.deviceId) {
+                    return ws.send(JSON.stringify({ type: 'error', message: 'Device ID is required.' }));
+                }
                 const newClip = {text : data.text , deviceId : data.deviceId};
                 const room = await Room.findOneAndUpdate(
                     {name : ws.room},
@@ -35,6 +48,9 @@ const handleSocketConnection = (ws , wss) => {
             }
 
             if(data.type === 'fetch_older_clips'){
+                if (typeof data.skip !== 'number' || data.skip < 0) {
+                    return ws.send(JSON.stringify({ type: 'error', message: 'Invalid pagination data.' }));
+                }
                 const room = await Room.findOne({name : ws.room});
                 if(room){
                     const olderClips = [...room.clips].reverse().slice(data.skip , data.skip + 10);
